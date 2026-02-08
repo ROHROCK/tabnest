@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful - TabNest</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 48px 32px;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .checkmark {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      animation: scaleIn 0.5s ease-out;
+    }
+    @keyframes scaleIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .checkmark svg {
+      stroke: white;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      width: 40px;
+      height: 40px;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: drawCheck 0.5s 0.3s ease-out forwards;
+    }
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 16px;
+      color: #64748b;
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+    .plan-name {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      margin: 16px 0;
+    }
+    .next-steps {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      text-align: left;
+    }
+    .next-steps h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+    .next-steps ol {
+      padding-left: 20px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .next-steps li {
+      margin-bottom: 8px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      margin-top: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    .support {
+      margin-top: 24px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .support a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="checkmark">
+      <svg viewBox="0 0 52 52">
+        <polyline points="14 27 22 35 38 19"/>
+      </svg>
+    </div>
+
+    <h1>Payment Successful!</h1>
+    <p>Welcome to TabNest Pro 🎉</p>
+
+    <div class="plan-name" id="planName">Pro Local</div>
+
+    <div class="next-steps">
+      <h3>Next Steps:</h3>
+      <ol>
+        <li>Your Pro features are now active in the extension</li>
+        <li>Close this tab and return to TabNest</li>
+        <li>Enjoy unlimited sessions, keyboard shortcuts, and more!</li>
+      </ol>
+    </div>
+
+    <a href="#" class="btn" id="returnBtn">Return to TabNest</a>
+
+    <p class="support">
+      Need help? <a href="mailto:nimbuslabsdevs@gmail.com">Contact Support</a>
+    </p>
+  </div>
+
+  <script>
+    // Parse session_id from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const plan = urlParams.get('plan') || 'pro_local';
+
+    // Update plan name display
+    const planNames = {
+      'pro_local': 'Pro Local',
+      'lifetime': 'Lifetime Access'
+    };
+    document.getElementById('planName').textContent = planNames[plan] || 'Pro';
+
+    // Auto-close and return to extension after 5 seconds
+    let countdown = 5;
+    const returnBtn = document.getElementById('returnBtn');
+
+    const updateButton = () => {
+      returnBtn.textContent = `Closing in ${countdown}s...`;
+      countdown--;
+      if (countdown < 0) {
+        window.close();
+      }
+    };
+
+    // Start countdown
+    const timer = setInterval(updateButton, 1000);
+    updateButton();
+
+    // Handle manual close
+    returnBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      clearInterval(timer);
+
+      // Try to communicate with extension
+      if (sessionId) {
+        // Store payment success in localStorage for extension to pick up
+        localStorage.setItem('tabnest_payment_success', JSON.stringify({
+          session_id: sessionId,
+          plan: plan,
+          timestamp: Date.now()
+        }));
+      }
+
+      window.close();
+    });
+
+    // Also store payment info on page load
+    if (sessionId) {
+      localStorage.setItem('tabnest_payment_success', JSON.stringify({
+        session_id: sessionId,
+        plan: plan,
+        timestamp: Date.now()
+      }));
+    }
+  </script>
+</body>
+</html>
