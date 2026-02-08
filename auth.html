@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - TabNest</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-light: #e0e7ff;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-container {
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-section svg {
+      width: 48px;
+      height: 48px;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .logo-section h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .logo-section p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 150ms;
+    }
+
+    .tab.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text);
+      transition: all 150ms;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 150ms;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 24px 0;
+      position: relative;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider span {
+      background: var(--bg-card);
+      padding: 0 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    .google-btn {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .google-btn:hover {
+      background: var(--bg);
+    }
+
+    .google-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-top: 8px;
+    }
+
+    .forgot-password a {
+      font-size: 13px;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .footer-note a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .footer-note a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="logo-section">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+        <polyline points="13 2 13 9 20 9"></polyline>
+      </svg>
+      <h1>Welcome to TabNest</h1>
+      <p>Sign in to unlock Pro features</p>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <!-- Magic Link Form -->
+    <form id="magicLinkForm">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" required>
+      </div>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+        We'll send you a magic link to sign in. No password needed!
+      </p>
+      <button type="submit" class="btn" id="magicLinkBtn">Send Magic Link</button>
+    </form>
+
+    <div class="footer-note">
+      By signing in, you agree to our <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+    </div>
+  </div>
+
+  <script>
+    // Supabase Configuration
+    const SUPABASE_CONFIG = {
+      url: 'https://gcvccivnitidzmmtuwla.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjdmNjaXZuaXRpZHptbXR1d2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NDc0OTksImV4cCI6MjA4NjEyMzQ5OX0.uZGPj4BBDG8W0OJxXDFQ_LH0iTJUs5I3hO-4si6lcOM'
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const messageBox = document.getElementById('message');
+    const magicLinkForm = document.getElementById('magicLinkForm');
+
+    // Initialize Supabase client
+    // Note: Replace with your actual Supabase credentials
+    let supabase = null;
+
+    // Check if SUPABASE_CONFIG is defined (from config file)
+    if (typeof SUPABASE_CONFIG !== 'undefined') {
+      supabase = window.supabase.createClient(
+        SUPABASE_CONFIG.url,
+        SUPABASE_CONFIG.anonKey
+      );
+    }
+
+    // Show message
+    function showMessage(text, type) {
+      messageBox.textContent = text;
+      messageBox.className = `message ${type}`;
+      messageBox.style.display = 'block';
+    }
+
+    // Check if user is already logged in (returning from magic link)
+    async function checkAuthState() {
+      if (!supabase) return;
+
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (session) {
+          // User is logged in! Get their license
+          const userId = session.user.id;
+          const userEmail = session.user.email;
+
+          showMessage('Signed in successfully! Syncing with extension...', 'success');
+
+          // Get user's license
+          const { data: license, error: licenseError } = await supabase
+            .from('licenses')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          // Store in extension via message passing
+          // Note: Extension must be listening for this message
+          try {
+            // Try to send message to extension
+            const extensionData = {
+              user: {
+                id: userId,
+                email: userEmail,
+              },
+              license: license || null,
+              isPro: license?.status === 'active',
+              planType: license?.plan_type || 'free',
+              timestamp: Date.now(),
+            };
+
+            // Store in localStorage as backup
+            localStorage.setItem('tabnest_user_session', JSON.stringify(extensionData));
+
+            console.log('✅ User authenticated:', extensionData);
+
+            // Show success message
+            showMessage(
+              license
+                ? `Welcome back! Your ${license.plan_type.replace('_', ' ')} plan is active.`
+                : 'Signed in! You\'re on the Free plan. Upgrade to unlock Pro features.',
+              'success'
+            );
+
+            // Wait 2 seconds then close window
+            setTimeout(() => {
+              window.close();
+              // If window doesn't close, show instruction
+              setTimeout(() => {
+                showMessage('You can now close this tab and return to the extension.', 'success');
+              }, 500);
+            }, 2000);
+
+          } catch (e) {
+            console.error('Could not communicate with extension:', e);
+            showMessage('Signed in! Please close this tab and reopen the extension.', 'success');
+          }
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      }
+    }
+
+    // Run auth check on page load
+    checkAuthState();
+
+    // Magic link form submission
+    magicLinkForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!supabase) {
+        showMessage('Supabase not configured. Please add your credentials to config/supabase-config.js', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('magicLinkBtn');
+      const email = document.getElementById('email').value;
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span> Sending...';
+
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: window.location.href, // Redirect back to this page
+          }
+        });
+
+        if (error) throw error;
+
+        // Success - show message
+        showMessage(
+          `Magic link sent to ${email}! Check your email and click the link to sign in.`,
+          'success'
+        );
+
+        // Disable form
+        document.getElementById('email').disabled = true;
+
+      } catch (error) {
+        console.error('Magic link error:', error);
+        showMessage(error.message || 'Failed to send magic link. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Send Magic Link';
+      }
+    });
+  </script>
+</body>
+</html>
