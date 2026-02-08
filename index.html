@@ -459,6 +459,8 @@
       transition: all 0.3s ease;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      text-align: center;
+      text-decoration: none;
     }
     .btn-pricing-primary {
       background: var(--primary-gradient);
@@ -826,7 +828,7 @@
             <li>Search & tags</li>
             <li>Session folders</li>
           </ul>
-          <button class="btn-pricing btn-pricing-primary">Upgrade Now</button>
+          <a href="https://buy.stripe.com/9B6eVe3JX1B82FR5ql2VG00" class="btn-pricing btn-pricing-primary" onclick="trackEvent('upgrade_clicked', { plan: 'pro_local', price: 1.99, location: 'pricing_card' })">Upgrade Now</a>
         </div>
 
         <!-- Pro Sync - Coming Soon (Disabled) -->
@@ -856,7 +858,7 @@
             <li>Priority support</li>
             <li>Lifetime updates</li>
           </ul>
-          <button class="btn-pricing btn-pricing-outline">Get Lifetime</button>
+          <a href="https://buy.stripe.com/5kQ28seoB4Nk2FRcSN2VG01" class="btn-pricing btn-pricing-outline" onclick="trackEvent('upgrade_clicked', { plan: 'lifetime', price: 19.99, location: 'pricing_card' })">Get Lifetime</a>
           <span class="pricing-highlight">🔥 Limited time offer</span>
         </div>
       </div>
