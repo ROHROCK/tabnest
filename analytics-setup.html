@@ -1,0 +1,70 @@
+<!-- Google Analytics 4 Setup for TabNest Website -->
+<!-- Add this to the <head> of: index.html, auth.html, success.html, cancel.html -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XF2L58ZME0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // TODO: Replace G-XF2L58ZME0 with your actual GA4 Measurement ID
+  gtag('config', 'G-XF2L58ZME0', {
+    send_page_view: true,
+    cookie_flags: 'SameSite=None;Secure'
+  });
+
+  // Helper function to track custom events
+  window.trackEvent = function(eventName, params = {}) {
+    gtag('event', eventName, params);
+    console.log('📊 Event tracked:', eventName, params);
+  };
+</script>
+
+<!--
+SETUP INSTRUCTIONS:
+
+1. Create Google Analytics 4 property:
+   - Go to: https://analytics.google.com
+   - Click "Admin" (bottom left)
+   - Click "Create Property"
+   - Name: "TabNest"
+   - Select timezone and currency
+   - Click "Create"
+
+2. Get your Measurement ID:
+   - After creating property, you'll see "G-XF2L58ZME0"
+   - Replace G-XF2L58ZME0 in the code above
+
+3. Add to all website pages:
+   - index.html (landing page)
+   - auth.html (sign in page)
+   - success.html (payment success)
+   - cancel.html (payment cancelled)
+
+4. Test:
+   - Visit your website
+   - Go to Analytics → Reports → Realtime
+   - Should see yourself as active user
+
+EVENT TRACKING EXAMPLES:
+
+Landing page (index.html):
+<button onclick="trackEvent('install_clicked', { location: 'hero' })">Install Free</button>
+<button onclick="trackEvent('upgrade_clicked', { plan: 'pro_local' })">Upgrade</button>
+<form onsubmit="trackEvent('email_captured')">...</form>
+
+Auth page (auth.html):
+trackEvent('magic_link_requested', { email_domain: email.split('@')[1] });
+trackEvent('magic_link_sent');
+trackEvent('auth_completed', { has_license: !!license });
+
+Success page (success.html):
+trackEvent('payment_completed', {
+  plan: 'pro_local',
+  value: 1.99,
+  currency: 'USD'
+});
+
+Cancel page (cancel.html):
+trackEvent('payment_cancelled', { plan: plan });
+-->

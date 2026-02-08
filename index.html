@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TabNest - Smart Tab Manager for Chrome</title>
   <meta name="description" content="Shelve tabs instantly, save sessions, restore anytime. The lightweight Chrome tab manager that saves memory and keeps you organized.">
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XF2L58ZME0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XF2L58ZME0', { send_page_view: true });
+
+    // Helper to track custom events
+    window.trackEvent = function(eventName, params = {}) {
+      gtag('event', eventName, params);
+      console.log('📊', eventName, params);
+    };
+  </script>
+
   <style>
     /* ─── Variables ────────────────────────── */
     :root {

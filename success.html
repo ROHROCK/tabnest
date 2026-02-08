@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Payment Successful - TabNest</title>
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XF2L58ZME0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XF2L58ZME0', { send_page_view: true });
+
+    window.trackEvent = function(eventName, params = {}) {
+      gtag('event', eventName, params);
+      console.log('📊', eventName, params);
+    };
+  </script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -172,6 +187,14 @@
     };
     document.getElementById('planName').textContent = planNames[plan] || 'Pro';
 
+    // Track payment completion
+    trackEvent('payment_completed', {
+      plan: plan,
+      value: plan === 'lifetime' ? 19.99 : 1.99,
+      currency: 'USD',
+      has_session_id: !!sessionId
+    });
+
     // Activate license
     async function activateLicense() {
       const step2 = document.getElementById('step2');
@@ -203,6 +226,12 @@
 
         if (mockActivation.success) {
           step2.innerHTML = '✅ Pro license activated!';
+
+          // Track license activation
+          trackEvent('license_activated', {
+            plan: plan,
+            license_key_partial: mockActivation.license.key.substr(0, 10) + '...'
+          });
 
           // Store activation data for extension to pick up
           localStorage.setItem('tabnest_activation', JSON.stringify({
