@@ -2,7 +2,7 @@
 
 Landing page and privacy policy for TabNest Chrome Extension.
 
-**Live Site:** https://[your-username].github.io/tabnest-website/
+**Live Site:** https://ROHROCK.github.io/tabnest-website/
 
 ## Files
 - `index.html` - Landing page with features, pricing, and email capture
