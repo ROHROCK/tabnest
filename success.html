@@ -159,12 +159,27 @@
       <ol>
         <li id="step1">✅ Payment confirmed</li>
         <li id="step2">⏳ Activating your Pro license...</li>
-        <li id="step3">Close this tab and return to TabNest</li>
+        <li id="step3">📧 Check your email for license details</li>
+        <li id="step4" style="display: none;">🔑 Open the extension and sign in to activate Pro</li>
       </ol>
     </div>
 
     <div id="activationStatus" style="display: none; margin-top: 16px; padding: 12px; background: #fef3c7; border-radius: 8px; font-size: 14px; color: #78350f;">
       ⚠️ Manual activation required. Please sign in to the extension to activate your license.
+    </div>
+
+    <div id="activationInstructions" style="display: none; margin-top: 24px; padding: 20px; background: #e0e7ff; border-radius: 12px; text-align: left;">
+      <h3 style="margin-top: 0; color: #4338ca; font-size: 16px; margin-bottom: 12px;">🎉 How to Activate Pro in Your Extension:</h3>
+      <ol style="margin: 0; padding-left: 20px; color: #4338ca; line-height: 1.8;">
+        <li>Open the <strong>TabNest extension</strong> in your browser</li>
+        <li>Click <strong>"Sign In"</strong> in the extension</li>
+        <li>Enter the email: <strong id="userEmail" style="color: #1e40af;"></strong></li>
+        <li>Check your email for the magic link and click it</li>
+        <li>Your Pro features will activate automatically! ✨</li>
+      </ol>
+      <p style="margin-top: 16px; margin-bottom: 0; font-size: 13px; color: #6366f1;">
+        💡 Your license key: <code id="licenseKeyDisplay" style="background: white; padding: 4px 8px; border-radius: 4px; font-weight: 600;"></code>
+      </p>
     </div>
 
     <a href="#" class="btn" id="returnBtn">Return to TabNest</a>
@@ -195,65 +210,80 @@
       has_session_id: !!sessionId
     });
 
-    // Activate license
+    // Activate license via server verification
+    const VERIFY_SESSION_URL = 'https://gcvccivnitidzmmtuwla.supabase.co/functions/v1/verify-session';
+
     async function activateLicense() {
       const step2 = document.getElementById('step2');
       const activationStatus = document.getElementById('activationStatus');
 
       try {
         if (!sessionId) {
-          throw new Error('No session ID found');
+          throw new Error('No session ID found. Please return to the extension and try again.');
         }
 
-        // TODO: Call your backend API to verify payment and activate license
-        // For now, simulate activation
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Call verify-session edge function to verify payment with Stripe
+        const response = await fetch(VERIFY_SESSION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId }),
+        });
 
-        // Mock response - replace with real API call
-        const mockActivation = {
-          success: true,
-          user: {
-            email: 'user@example.com',
-            userId: 'user_123'
-          },
-          license: {
-            key: 'LICENSE_KEY_123',
-            plan: plan,
-            status: 'active',
-            expiresAt: plan === 'lifetime' ? null : Date.now() + (365 * 24 * 60 * 60 * 1000)
-          }
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || 'Payment verification failed');
+        }
+
+        const license = result.license;
+
+        step2.innerHTML = '✅ Pro license activated!';
+
+        // Show the sign-in instruction
+        document.getElementById('step4').style.display = 'list-item';
+
+        // Show activation instructions
+        const instructionsEl = document.getElementById('activationInstructions');
+        const emailEl = document.getElementById('userEmail');
+        const licenseKeyEl = document.getElementById('licenseKeyDisplay');
+
+        emailEl.textContent = license.email;
+        licenseKeyEl.textContent = license.license_key;
+        instructionsEl.style.display = 'block';
+
+        // Update plan name from server response
+        const planDisplayNames = {
+          'pro_local': 'Pro Local',
+          'lifetime': 'Lifetime Access'
         };
+        document.getElementById('planName').textContent =
+          planDisplayNames[license.plan_type] || 'Pro';
 
-        if (mockActivation.success) {
-          step2.innerHTML = '✅ Pro license activated!';
+        // Track license activation
+        trackEvent('license_activated', {
+          plan: license.plan_type,
+          license_key_partial: license.license_key.substring(0, 14) + '...'
+        });
 
-          // Track license activation
-          trackEvent('license_activated', {
-            plan: plan,
-            license_key_partial: mockActivation.license.key.substr(0, 10) + '...'
-          });
+        // Store real activation data for extension to pick up
+        localStorage.setItem('tabnest_activation', JSON.stringify({
+          user: { email: license.email },
+          license: {
+            key: license.license_key,
+            plan: license.plan_type,
+            status: license.status,
+            expiresAt: license.expires_at
+          },
+          verified: true,
+          timestamp: Date.now()
+        }));
 
-          // Store activation data for extension to pick up
-          localStorage.setItem('tabnest_activation', JSON.stringify({
-            user: mockActivation.user,
-            license: mockActivation.license,
-            timestamp: Date.now()
-          }));
+        console.log('License activated:', license.license_key, license.plan_type);
 
-          // Try to send message to extension if installed
-          try {
-            // Note: Extension ID will be different - update when published
-            // This is a placeholder for future implementation
-            console.log('License activated:', mockActivation);
-          } catch (e) {
-            console.log('Could not communicate with extension:', e);
-          }
-        } else {
-          throw new Error('Activation failed');
-        }
       } catch (error) {
         console.error('Activation error:', error);
         step2.innerHTML = '❌ Activation pending';
+        activationStatus.textContent = `⚠️ ${error.message || 'Could not verify payment. Please sign in to the extension to activate your license.'}`;
         activationStatus.style.display = 'block';
       }
     }
@@ -261,15 +291,18 @@
     // Run activation
     activateLicense();
 
-    // Auto-close and return to extension after 5 seconds
-    let countdown = 5;
+    // Auto-close and return to extension after 10 seconds
+    let countdown = 10;
     const returnBtn = document.getElementById('returnBtn');
 
     const updateButton = () => {
-      returnBtn.textContent = `Closing in ${countdown}s...`;
-      countdown--;
-      if (countdown < 0) {
+      if (countdown === 0) {
+        returnBtn.textContent = 'Closing...';
+        clearInterval(timer);
         window.close();
+      } else {
+        returnBtn.textContent = `Closing in ${countdown}s...`;
+        countdown--;
       }
     };
 

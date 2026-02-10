@@ -394,13 +394,19 @@
               'success'
             );
 
+            // DEBUG MODE: Disabled auto-close so you can see the page
             // Wait 2 seconds then close window
+            // setTimeout(() => {
+            //   window.close();
+            //   // If window doesn't close, show instruction
+            //   setTimeout(() => {
+            //     showMessage('You can now close this tab and return to the extension.', 'success');
+            //   }, 500);
+            // }, 2000);
+
+            // Show message to close manually
             setTimeout(() => {
-              window.close();
-              // If window doesn't close, show instruction
-              setTimeout(() => {
-                showMessage('You can now close this tab and return to the extension.', 'success');
-              }, 500);
+              showMessage('✅ Authentication complete! You can close this tab manually.', 'success');
             }, 2000);
 
           } catch (e) {
@@ -440,7 +446,7 @@
         const { error } = await supabaseClient.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: window.location.href, // Redirect back to this page
+            emailRedirectTo: 'https://ROHROCK.github.io/tabnest/auth.html',
             shouldCreateUser: true, // Auto-create user if doesn't exist
           }
         });
